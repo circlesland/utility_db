@@ -10,7 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - id: readPackageJson
-        working-directory: ./utility_db
         run: |
           content=`cat ./package.json`
           # the following lines are only required for multi line json
@@ -20,7 +19,6 @@ jobs:
           # end of optional handling for multi line json
           echo "::set-output name=packageJson::$content"
       - name: Build and publish the docker image
-        working-directory: ./utility_db
         env:
           DOCKER_REGISTRY_USER: ${{secrets.DOCKER_REGISTRY_USER}}
           DOCKER_REGISTRY_PASSWORD: ${{secrets.DOCKER_REGISTRY_PASSWORD}}
