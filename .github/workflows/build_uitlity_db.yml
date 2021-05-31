@@ -1,0 +1,31 @@
+name: build utility_db
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - id: readPackageJson
+        working-directory: ./utility_db
+        run: |
+          content=`cat ./package.json`
+          # the following lines are only required for multi line json
+          content="${content//'%'/'%25'}"
+          content="${content//$'\n'/'%0A'}"
+          content="${content//$'\r'/'%0D'}"
+          # end of optional handling for multi line json
+          echo "::set-output name=packageJson::$content"
+      - name: Build and publish the docker image
+        working-directory: ./utility_db
+        env:
+          DOCKER_REGISTRY_USER: ${{secrets.DOCKER_REGISTRY_USER}}
+          DOCKER_REGISTRY_PASSWORD: ${{secrets.DOCKER_REGISTRY_PASSWORD}}
+        run: |
+          wget https://o-static.fra1.cdn.digitaloceanspaces.com/utility_db/places_20210531.sql
+          docker login https://ghcr.io -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
+          docker build . --tag ghcr.io/circlesland/utility_db:latest --tag ghcr.io/circlesland/utility_db:${{fromJson(steps.readPackageJson.outputs.packageJson).version}} --tag utility_db --tag main
+          docker push ghcr.io/circlesland/utility_db:${{fromJson(steps.readPackageJson.outputs.packageJson).version}}
