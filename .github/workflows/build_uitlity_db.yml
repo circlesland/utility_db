@@ -23,7 +23,7 @@ jobs:
           DOCKER_REGISTRY_USER: ${{secrets.DOCKER_REGISTRY_USER}}
           DOCKER_REGISTRY_PASSWORD: ${{secrets.DOCKER_REGISTRY_PASSWORD}}
         run: |
-          wget https://o-static.fra1.cdn.digitaloceanspaces.com/utility_db/places_20210531.sql
+          wget https://o-static.fra1.digitaloceanspaces.com/utility_db/places_20210601.sql
           docker login https://ghcr.io -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
           docker build . --tag ghcr.io/circlesland/utility_db:latest --tag ghcr.io/circlesland/utility_db:${{fromJson(steps.readPackageJson.outputs.packageJson).version}} --tag utility_db --tag main
           docker push ghcr.io/circlesland/utility_db:${{fromJson(steps.readPackageJson.outputs.packageJson).version}}
